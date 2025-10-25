@@ -101,32 +101,36 @@ const questions = [
   {q:"独处时你感到？",a:["平静","孤单","自在"],t:["Beta","Omega","Alpha"]},
   {q:"你认为命运？",a:["可被改变","顺其自然","由心决定"],t:["Alpha","Beta","Omega"]}
 ];
-let current=0,score={Alpha:0,Beta:0,Omega:0};
 
-const container=document.getElementById("container");
-document.getElementById("startBtn").onclick=()=>loadQuestion();
+let index = 0;
+let score = {Alpha:0,Beta:0,Omega:0};
+const app = document.getElementById("app");
 
-function loadQuestion(){
-  if(current<questions.length){
-    const q=questions[current];
-    container.innerHTML=`
+document.getElementById("start").onclick = ()=>showQuestion();
+
+function showQuestion(){
+  if(index<questions.length){
+    const q=questions[index];
+    app.innerHTML=`
       <h2>${q.q}</h2>
-      <div class="progress"><div class="progress-bar" style="width:${(current/questions.length)*100}%"></div></div>
-      ${q.a.map((opt,i)=>`<button onclick="choose(${i})">${opt}</button>`).join("<br><br>")}
+      <div class='progress'><div class='bar' style='width:${(index/questions.length)*100}%'></div></div>
+      ${q.a.map((opt,i)=>`<button onclick='choose(${i})'>${opt}</button>`).join("<br><br>")}
     `;
-  }else showResult();
+  }else{
+    showResult();
+  }
 }
 
 function choose(i){
-  const type=questions[current].t[i];
-  score[type]++;
-  current++;
-  loadQuestion();
+  const q=questions[index];
+  score[q.t[i]]++;
+  index++;
+  showQuestion();
 }
 
 function showResult(){
-  const type = Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
-  const oracles = {
+  const type=Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
+  const oracles={
     Alpha:[
       "你的灵魂属于Alpha——冷静而锋利的力量在你体内苏醒。",
       "Alpha之力，如寒夜星光般清醒而坚定。",
@@ -143,19 +147,21 @@ function showResult(){
       "你是治愈者，也是觉醒者。"
     ]
   };
-  const text = oracles[type][Math.floor(Math.random()*oracles[type].length)];
-
-  app.innerHTML = `
+  const text=oracles[type][Math.floor(Math.random()*oracles[type].length)];
+  app.innerHTML=`
     <h2>你的类型：${type}</h2>
     <p id="oracle" style="min-height:80px;"></p>
-    <canvas id="chart" width="300" height="300"></canvas>
-    <p style="font-size:12px;color:#aaa;">本测评仅供娱乐参考</p>
-    <button onclick="location.reload()">再测一次</button>
+    <canvas id='chart' width='300' height='300'></canvas>
+    <p style='font-size:12px;color:#aaa;'>本测评仅供娱乐参考</p>
+    <button onclick='location.reload()'>再测一次</button>
   `;
-  typeWriter("oracle", text, 50, ()=>drawChart());
+  typeWriter("oracle", text, 40, ()=>drawChart());
 }
+
 function typeWriter(id, text, speed, callback){
   const el=document.getElementById(id);
+  if(!el){ if(callback) callback(); return; }
+  el.innerHTML="";
   let i=0;
   function typing(){
     if(i<text.length){
@@ -166,6 +172,7 @@ function typeWriter(id, text, speed, callback){
   }
   typing();
 }
+
 function drawChart(){
   const ctx=document.getElementById('chart');
   new Chart(ctx,{
@@ -177,20 +184,11 @@ function drawChart(){
         data:[score.Alpha,score.Beta,score.Omega],
         borderColor:'rgba(122,0,255,0.8)',
         backgroundColor:'rgba(122,0,255,0.2)',
-        pointBackgroundColor:'#00c6ff',
-        borderWidth:2
+        pointBackgroundColor:'#00c6ff'
       }]
     },
     options:{
-      scales:{
-        r:{
-          angleLines:{color:'rgba(0,198,255,0.3)'},
-          grid:{color:'rgba(122,0,255,0.3)'},
-          pointLabels:{color:'#d0cfff'},
-          suggestedMin:0,
-          suggestedMax:5
-        }
-      },
+      scales:{r:{angleLines:{color:'rgba(0,198,255,0.3)'},grid:{color:'rgba(122,0,255,0.3)'},pointLabels:{color:'#d0cfff'},suggestedMin:0,suggestedMax:10}},
       plugins:{legend:{display:false}}
     }
   });
