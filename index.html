@@ -122,10 +122,17 @@ function showQuestion(){
 }
 
 function choose(i){
-  const q=questions[index];
-  score[q.t[i]]++;
-  index++;
-  showQuestion();
+  if(index < questions.length){
+    const q = questions[index];
+    if(!q || !q.t){ return; } // 防呆保护
+    score[q.t[i]]++;
+    index++;
+    if(index >= questions.length){
+      showResult();
+    }else{
+      showQuestion();
+    }
+  }
 }
 
 function showResult(){
