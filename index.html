@@ -125,8 +125,8 @@ function choose(i){
 }
 
 function showResult(){
-  const type=Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
-  const oracles={
+  const type = Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
+  const oracles = {
     Alpha:[
       "你的灵魂属于Alpha——冷静而锋利的力量在你体内苏醒。",
       "Alpha之力，如寒夜星光般清醒而坚定。",
@@ -143,16 +143,16 @@ function showResult(){
       "你是治愈者，也是觉醒者。"
     ]
   };
-  const text=oracles[type][Math.floor(Math.random()*oracles[type].length)];
+  const text = oracles[type][Math.floor(Math.random()*oracles[type].length)];
 
-  app.innerHTML=`
+  app.innerHTML = `
     <h2>你的类型：${type}</h2>
     <p id="oracle" style="min-height:80px;"></p>
-    <canvas id='chart' width='300' height='300'></canvas>
-    <p style='font-size:12px;color:#aaa;'>本测评仅供娱乐参考</p>
-    <button onclick='location.reload()'>再测一次</button>
+    <canvas id="chart" width="300" height="300"></canvas>
+    <p style="font-size:12px;color:#aaa;">本测评仅供娱乐参考</p>
+    <button onclick="location.reload()">再测一次</button>
   `;
-  typeWriter("oracle", text, 40, ()=>drawChart());
+  typeWriter("oracle", text, 50, ()=>drawChart());
 }
 function typeWriter(id, text, speed, callback){
   const el=document.getElementById(id);
