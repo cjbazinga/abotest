@@ -1,0 +1,170 @@
+Get started by creating a new file or uploading an existing file.
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABO信息素觉醒测试</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Old+Mincho&display=swap');
+body {
+  margin: 0;
+  font-family: '宋体', 'Zen Old Mincho', 'Times New Roman', serif;
+  background: radial-gradient(circle at 50% 20%, #1b0033, #000010);
+  color: #d0cfff;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+#container {
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  background: rgba(20,20,40,0.6);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px #7a00ff88;
+}
+button {
+  background: linear-gradient(90deg, #7a00ff, #00c6ff);
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #7a00ff;
+}
+button:hover {
+  box-shadow: 0 0 20px #00c6ff;
+}
+.progress {
+  height: 8px;
+  background: #300050;
+  border-radius: 5px;
+  margin: 20px 0;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #7a00ff, #00c6ff);
+  transition: width 0.4s;
+}
+canvas {
+  margin-top: 20px;
+}
+.fade-in {
+  animation: fadein 1.2s ease-in-out;
+}
+@keyframes fadein {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+</style>
+</head>
+<body>
+<div id="container" class="fade-in">
+  <h1>ABO信息素觉醒测试</h1>
+  <p id="intro">感受信息素流动的频率…</p>
+  <button id="startBtn">开始测试</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const questions = [
+  {q:"当你被误解时，你会？",a:["解释清楚","保持沉默","用行动证明"],t:["Beta","Omega","Alpha"]},
+  {q:"面对竞争，你更倾向？",a:["主动出击","静观其变","协作取胜"],t:["Alpha","Omega","Beta"]},
+  {q:"在团队中你通常？",a:["领导方向","融入群体","提供支持"],t:["Alpha","Omega","Beta"]},
+  {q:"当压力来临，你？",a:["迎难而上","情绪低落","寻求安慰"],t:["Alpha","Omega","Beta"]},
+  {q:"你对亲密关系的理解是？",a:["掌控与保护","融合与依附","陪伴与共鸣"],t:["Alpha","Omega","Beta"]}
+];
+let current=0,score={Alpha:0,Beta:0,Omega:0};
+
+const container=document.getElementById("container");
+document.getElementById("startBtn").onclick=()=>loadQuestion();
+
+function loadQuestion(){
+  if(current<questions.length){
+    const q=questions[current];
+    container.innerHTML=`
+      <h2>${q.q}</h2>
+      <div class="progress"><div class="progress-bar" style="width:${(current/questions.length)*100}%"></div></div>
+      ${q.a.map((opt,i)=>`<button onclick="choose(${i})">${opt}</button>`).join("<br><br>")}
+    `;
+  }else showResult();
+}
+
+function choose(i){
+  const type=questions[current].t[i];
+  score[type]++;
+  current++;
+  loadQuestion();
+}
+
+function showResult(){
+  const total=current;
+  const res=Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
+  const oracleSets={
+    Alpha:[
+      "你的灵魂属于Alpha——冷静而锋利的力量在你体内苏醒。",
+      "Alpha之力，如寒夜星光般清醒而坚定。",
+      "你是天生的引领者，孤独却耀眼。"
+    ],
+    Beta:[
+      "你的灵魂属于Beta——平衡、智慧与柔光并存。",
+      "你能感知他人情绪的波动，如潮汐般温柔。",
+      "你的力量在于协调与共鸣。"
+    ],
+    Omega:[
+      "你的灵魂属于Omega——柔韧之下暗藏惊人的力量。",
+      "你以情感为刃，撕开世界的伪装。",
+      "你是治愈者，也是觉醒者。"
+    ]
+  };
+  const oracle=oracleSets[res][Math.floor(Math.random()*oracleSets[res].length)];
+
+  container.innerHTML=`
+    <h2>测试结果：${res}</h2>
+    <p>${oracle}</p>
+    <canvas id="chart" width="300" height="300"></canvas>
+    <p style="font-size:12px;color:#aaa;">本测评仅供娱乐参考</p>
+    <button onclick="location.reload()">再测一次</button>
+  `;
+  drawChart();
+}
+
+function drawChart(){
+  const ctx=document.getElementById('chart');
+  new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['Alpha','Beta','Omega'],
+      datasets:[{
+        label:'信息素分布',
+        data:[score.Alpha,score.Beta,score.Omega],
+        borderColor:'rgba(122,0,255,0.8)',
+        backgroundColor:'rgba(122,0,255,0.2)',
+        pointBackgroundColor:'#00c6ff',
+        borderWidth:2
+      }]
+    },
+    options:{
+      scales:{
+        r:{
+          angleLines:{color:'rgba(0,198,255,0.3)'},
+          grid:{color:'rgba(122,0,255,0.3)'},
+          pointLabels:{color:'#d0cfff'},
+          suggestedMin:0,
+          suggestedMax:5
+        }
+      },
+      plugins:{legend:{display:false}}
+    }
+  });
+}
+</script>
+</body>
+</html>
